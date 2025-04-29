@@ -115,6 +115,7 @@ DLL_EXPORT WCHAR *mini_rv32ima_get_last_line(VOID) {
 		WCHAR *ret = malloc(length * 2);
 		memcpy(ret, String, length * 2);
 		NewLine = FALSE;
+		StringIndex = 0;
 		return ret;
 	}
 }
