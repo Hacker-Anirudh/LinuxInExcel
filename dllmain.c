@@ -111,7 +111,7 @@ DLL_EXPORT INT mini_rv32ima_step(INT count) {
 DLL_EXPORT WCHAR *mini_rv32ima_get_last_line(VOID) {
 	if (!NewLine) { return 0; }
 	else {
-		SIZE_T length = wcslen(String);
+		SIZE_T length = wcslen(String) + 1;
 		WCHAR *ret = malloc(length * 2);
 		memcpy(ret, String, length * 2);
 		NewLine = FALSE;
