@@ -23,12 +23,13 @@ void mini_rv32ima_putchar(char c) {
 		if (c == 'm' || c == 'A' || c == 'B' || c == 'C' || c == 'D') parse = FALSE;
 		return;
 	}
-	if (carriage == 0 && !feed) { memset(output, 0, 1024 * 2); }
+	if (carriage == 0 && !feed) memset(output, 0, 1024 * 2);
 	if (c == '\r' || c == '\n' || c == '\0') {
 		carriage = 0;
 		feed = TRUE;
 		return;
 	}
+
 	output[carriage++] = (WCHAR)c;
 }
 
@@ -135,6 +136,7 @@ DLL_EXPORT WCHAR *mini_rv32ima_get_last_line(VOID) {
 	memcpy(ret, output, (length + 1) * sizeof(WCHAR));
 	feed = FALSE;
 	carriage = 0;
+
 	return ret;
 }
 
