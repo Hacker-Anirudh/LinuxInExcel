@@ -1,6 +1,7 @@
 # Linux In Excel
 Linux running in Excel
-![image](https://github.com/user-attachments/assets/827e7c44-1bcc-4272-b7c3-2ef5db846c53)
+![image](https://github.com/user-attachments/assets/da567dcd-90bb-426a-b5c5-f7ee74055b6a)
+
 
 # How?
 It makes use of [mini-rv32ima](https://github.com/cnlohr/mini-rv32ima). 
