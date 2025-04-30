@@ -141,11 +141,17 @@ DLL_EXPORT WCHAR *mini_rv32ima_get_last_line(VOID) {
 }
 
 DLL_EXPORT INT mini_rv32ima_pass_line(CHAR *line) {
-  	int len = strlen(line);
-	if (line == NULL || len == 0) return 0;
+    if (line == NULL) return 0;
+	int len = strlen(line);
 
-    base = calloc(len + 1, sizeof(CHAR));
-    input = base;
+    if (strcmp(line, "[ESC]") == 0) {
+        line = "\x1B";
+        len = 1;
+    }
+
+	if (len == 0) return 0;
+	base = calloc(len + 1, sizeof(CHAR));
+	input = base;
 
     memcpy(base, line, len);
 
