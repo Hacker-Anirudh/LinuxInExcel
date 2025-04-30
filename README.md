@@ -1,7 +1,6 @@
 # Linux In Excel
 Linux running in Excel
-![image](https://github.com/user-attachments/assets/da567dcd-90bb-426a-b5c5-f7ee74055b6a)
-
+![image](https://github.com/user-attachments/assets/321199ec-0191-4296-815e-8da17d9454a8)
 
 # How?
 It makes use of [mini-rv32ima](https://github.com/cnlohr/mini-rv32ima). 
@@ -15,4 +14,4 @@ Use the following command
 cl dllmain.c /LD /Fefun.dll
 ```
 Then in the Excel file change the path to the dll.
-You can pass in input by writing the text in the C2 cell
+You can pass in input by writing the text in the C2 cell. (Thank you Endermanch for adding support for this!)
