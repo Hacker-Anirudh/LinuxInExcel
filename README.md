@@ -15,3 +15,4 @@ Use the following command
 cl dllmain.c /LD /Fefun.dll
 ```
 Then in the Excel file change the path to the dll.
+You can pass in input by writing the text in the C2 cell
