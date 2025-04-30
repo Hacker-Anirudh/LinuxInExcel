@@ -1,37 +1,50 @@
 #include <stdio.h>
+#include <conio.h>
 #include <windows.h>
 #include <stdint.h>
 #include <stdlib.h>
 
 #include "BootImage.h"
-#define BOOT_IMAGE_SIZE 3476752
 
+#define BOOT_IMAGE_SIZE 3476752
 #define DLL_EXPORT __declspec(dllexport)
 
-BOOLEAN NewLine = FALSE;
-
-WCHAR *String = NULL;
-ULONG StringIndex = 0;
+BOOLEAN feed = FALSE;
+WCHAR *output = NULL;
+CHAR *base = NULL;
+CHAR *input = NULL;
+ULONG carriage = 0;
 
 void mini_rv32ima_putchar(char c) {
-	if (StringIndex == 0 && !NewLine) { memset(String, 0, 1024 * 2); }
-	if (c == '\r' || c == '\n' || c == '\0') {
-		StringIndex = 0;
-		NewLine = TRUE;
+  	static BOOLEAN parse = FALSE;
+
+	if (c == '\033') parse = TRUE;
+    if (parse) {
+		if (c == 'm' || c == 'A' || c == 'B' || c == 'C' || c == 'D') parse = FALSE;
 		return;
 	}
-	String[StringIndex++] = (WCHAR)c;
+	if (carriage == 0 && !feed) memset(output, 0, 1024 * 2);
+	if (c == '\r' || c == '\n' || c == '\0') {
+		carriage = 0;
+		feed = TRUE;
+		return;
+	}
+
+	output[carriage++] = (WCHAR)c;
 }
 
 void mini_rv32ima_print(char* string) {
+  for (int i = 0; i < strlen(string) + 1; i++) {
+	mini_rv32ima_putchar(string[i]);
+  }
 }
 
 int mini_rv32ima_key_hit(void) {
-	return 0;
+	return _kbhit();
 }
 
 int mini_rv32ima_get_key(void) {
-	return -1;
+	return _getch();
 }
 
 void* mini_rv32ima_malloc(size_t count) {
@@ -56,16 +69,23 @@ void mini_rv32ima_handle_other_csr_write(uint16_t csrno, uint32_t value) {
 
 uint32_t mini_rv32ima_handle_other_csr_read(uint16_t csrno) {
 	if (csrno == 0x140) {
-		if (!mini_rv32ima_key_hit()) return -1;
-		return mini_rv32ima_get_key();
+		if (!base) return -1;
+		if (*input) return *input++;
+
+        free(base);
+        base = NULL;
+		input = NULL;
+
+		return '\r';
 	}
+
 	return 0;
 }
 
-#define RAM_SIZE  64 * 1024 * 1024
+#define RAM_SIZE 64 * 1024 * 1024
 
 #define MINIRV32WARN
-#define MINIRV32_DECORATE  static
+#define MINIRV32_DECORATE static
 #define MINI_RV32_RAM_SIZE RAM_SIZE
 #define MINIRV32_IMPLEMENTATION
 #define MINIRV32_HANDLE_MEM_STORE_CONTROL(addy, val) if(mini_rv32ima_handle_control_store( addy, val )) return val;
@@ -80,10 +100,10 @@ uint8_t* memory = NULL;
 struct MiniRV32IMAState* cpu = NULL;
 
 DLL_EXPORT BOOLEAN mini_rv32ima_init(VOID) {
-    	memory = mini_rv32ima_malloc(RAM_SIZE);
+	memory = mini_rv32ima_malloc(RAM_SIZE);
 	memset(memory, 0, RAM_SIZE);
 
-	String = malloc(1024 * 2);
+	output = malloc(1024 * 2);
 
 	memcpy(memory, BootImage, BOOT_IMAGE_SIZE);
 
@@ -105,17 +125,29 @@ DLL_EXPORT BOOLEAN mini_rv32ima_init(VOID) {
 }
 
 DLL_EXPORT INT mini_rv32ima_step(INT count) {
-    return  MiniRV32IMAStep(cpu, memory, 0, 1, count);
+    return MiniRV32IMAStep(cpu, memory, 0, 1, count);
 }
 
 DLL_EXPORT WCHAR *mini_rv32ima_get_last_line(VOID) {
-	if (!NewLine) { return 0; }
-	else {
-		SIZE_T length = wcslen(String) + 1;
-		WCHAR *ret = malloc(length * 2);
-		memcpy(ret, String, length * 2);
-		NewLine = FALSE;
-		StringIndex = 0;
-		return ret;
-	}
+	if (!feed) return 0;
+
+	SIZE_T length = wcslen(output);
+	WCHAR *ret = malloc((length + 1) * sizeof(WCHAR));
+	memcpy(ret, output, (length + 1) * sizeof(WCHAR));
+	feed = FALSE;
+	carriage = 0;
+
+	return ret;
+}
+
+DLL_EXPORT INT mini_rv32ima_pass_line(CHAR *line) {
+  	int len = strlen(line);
+	if (line == NULL || len == 0) return 0;
+
+    base = calloc(len + 1, sizeof(CHAR));
+    input = base;
+
+    memcpy(base, line, len);
+
+    return 0;
 }
