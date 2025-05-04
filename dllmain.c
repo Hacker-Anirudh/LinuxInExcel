@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "BootImage.h"
-#include <string.h>
 #define BOOT_IMAGE_SIZE 3476752
 #define DLL_EXPORT __declspec(dllexport)
 
