@@ -2,6 +2,33 @@
 Linux running in Excel
 ![image](https://github.com/user-attachments/assets/321199ec-0191-4296-815e-8da17d9454a8)
 
+# List of special keys
+Here is a list of special keys implemented in dllmain.c which can be used by typing them into C2:
+
+- `[ESC]`
+- `[ENTER]`
+- `[BACKSPACE]`
+- `[TAB]`
+- `[CTRL+C]`
+- `[CTRL+Z]`
+- `[CTRL+X]`
+- `[CTRL+V]`
+- `[CTRL+A]`
+- `[CTRL+S]`
+- `[CTRL+D]`
+- `[CTRL+F]`
+- `[CTRL+Q]`
+- `[CTRL+W]`
+- `[CTRL+E]`
+- `[CTRL+R]`
+- `[CTRL+T]`
+- `[CTRL+Y]`
+- `[CTRL+U]`
+- `[CTRL+H]`
+- `[CTRL+L]`
+- `[CTRL+G]`
+- `[CTRL+P]`
+
 # How?
 It makes use of [mini-rv32ima](https://github.com/cnlohr/mini-rv32ima). 
 The emulator is built as a seperate dll which is loaded by the VBA macro. The VBA macro calls the emulator in the dll and gets the output and writes it into the cells in the spreadsheet.

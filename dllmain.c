@@ -3,9 +3,8 @@
 #include <windows.h>
 #include <stdint.h>
 #include <stdlib.h>
-
 #include "BootImage.h"
-
+#include <string.h>
 #define BOOT_IMAGE_SIZE 3476752
 #define DLL_EXPORT __declspec(dllexport)
 
@@ -141,19 +140,55 @@ DLL_EXPORT WCHAR *mini_rv32ima_get_last_line(VOID) {
 }
 
 DLL_EXPORT INT mini_rv32ima_pass_line(CHAR *line) {
-    if (line == NULL) return 0;
+	if (line == NULL) return 0;
 	int len = strlen(line);
 
-    if (strcmp(line, "[ESC]") == 0) {
-        line = "\x1B";
-        len = 1;
-    }
+	// Lookup table for special keys
+	static const struct {
+		const char *key;
+		const char *value;
+	} lookup_table[] = {
+		{"[ESC]", "\x1B"},
+		{"[ENTER]", "\r"},
+		{"[BACKSPACE]", "\b"},
+		{"[TAB]", "\t"},
+		{"[CTRL+C]", "\x03"},
+		{"[CTRL+Z]", "\x1A"},
+		{"[CTRL+X]", "\x18"},
+		{"[CTRL+V]", "\x16"},
+		{"[CTRL+A]", "\x01"},
+		{"[CTRL+S]", "\x13"},
+		{"[CTRL+D]", "\x04"},
+		{"[CTRL+F]", "\x06"},
+		{"[CTRL+Q]", "\x11"},
+		{"[CTRL+W]", "\x17"},
+		{"[CTRL+E]", "\x05"},
+		{"[CTRL+R]", "\x12"},
+		{"[CTRL+T]", "\x14"},
+		{"[CTRL+Y]", "\x19"},
+		{"[CTRL+U]", "\x15"},
+		{"[CTRL+H]", "\x08"},
+		{"[CTRL+L]", "\x0C"},
+		{"[CTRL+G]", "\x07"},
+		{"[CTRL+P]", "\x10"},
+		{"", ""}
+	};
 
+	// Check if the line is in the lookup table
+	for (int i = 0; lookup_table[i].key != NULL; i++) {
+		if (strcmp(line, lookup_table[i].key) == 0) {
+			line = (CHAR *)lookup_table[i].value;
+			len = 1;
+			break;
+		}
+	}
+
+	// If the line is empty, return 0 and terminate the function
 	if (len == 0) return 0;
 	base = calloc(len + 1, sizeof(CHAR));
 	input = base;
 
-    memcpy(base, line, len);
+	memcpy(base, line, len);
 
-    return 0;
+	return 0;
 }
